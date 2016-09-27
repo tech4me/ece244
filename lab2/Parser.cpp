@@ -139,12 +139,12 @@ int parser()
 		}
 		catch (const std::out_of_range& e) // Undefined command
 		{
-			std::cerr << "Error: invalid command" << std::endl;
-			//std::cerr << e.what() << std::endl; // Print out exception type
+			std::cout << "Error: invalid command" << std::endl;
+			//std::cout << e.what() << std::endl; // Print out exception type
 		}
 		catch (const std::exception& e) // Other
 		{
-			std::cerr << "Error " << e.what() << std::endl; // Print out exception type
+			std::cout << "Error " << e.what() << std::endl; // Print out exception type
 		}
 
 		std::cout << "> "; // Sign for each line
