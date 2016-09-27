@@ -136,14 +136,18 @@ int parser()
 }
 
 void _modifyR(std::stringstream& in_str_stream)
-{
+{ 
     std::stringstream temp_str_stream;
-    temp_str_stream  << in_str_stream.rdbuf();
+    temp_str_stream  << in_str_stream.str();
     std::string temp;
+    std::string dump;
+    in_str_stream >> dump;
+    temp_str_stream >> dump;
     int counter = 0;
     while(temp_str_stream >> temp)
     {
         ++counter;
+        //std::cout << temp;
     }
     if(counter < 2)
     {
@@ -157,7 +161,8 @@ void _modifyR(std::stringstream& in_str_stream)
     {
         std::string name;
         std::string resistance;
-        in_str_stream >> name;
+        temp_str_stream >> name;
+        std::cout << name << std::endl;
         if(name == "all")
         {
             throw e_r_name_cannot_be_all();
@@ -165,8 +170,9 @@ void _modifyR(std::stringstream& in_str_stream)
         in_str_stream >> resistance;
         try
         {
-            double temp = std::stod(resistance);
-            if(temp < 0)
+            std::cout << resistance << std::endl;
+            double double_temp = std::stod(resistance);
+            if(double_temp < 0)
             {
                 throw e_negative_r();
             }
@@ -174,10 +180,6 @@ void _modifyR(std::stringstream& in_str_stream)
         catch(const std::invalid_argument& e)  // Cannot convert to int
         {
             throw e_invalid_arg();
-        }
-        catch (const std::out_of_range& e) // Out of the bound of double
-        {
-            throw e_node_out_of_range(nodeid);
         }
         std::cout << "modifyR "<< name << " " << resistance << std::endl;
     }
