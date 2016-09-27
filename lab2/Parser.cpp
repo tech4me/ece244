@@ -21,6 +21,14 @@ class e_invalid_arg : public std::exception
     }
 };
 
+class e_negative_r : public std::exception
+{
+    virtual const char* what() const throw()
+    {
+        return "negative resistance";
+    }
+};
+
 class e_node_out_of_range : public std::exception
 {
     public:
@@ -34,6 +42,14 @@ class e_node_out_of_range : public std::exception
         {
             return temp.c_str();
         }
+};
+
+class e_r_name_cannot_be_all : public std::exception
+{
+    virtual const char* what() const throw()
+    {
+        return "resistor name cannot be the keyword \"all\" ";
+    }
 };
 
 class e_too_many_args : public std::exception
@@ -144,9 +160,26 @@ void _modifyR(std::stringstream& in_str_stream)
         in_str_stream >> name;
         if(name == "all")
         {
-            throw e_invalid_arg();
+            throw e_r_name_cannot_be_all();
         }
         in_str_stream >> resistance;
+        try
+        {
+            double temp = std::stod(resistance);
+            if(temp < 0)
+            {
+                throw e_negative_r();
+            }
+        }
+        catch(const std::invalid_argument& e)  // Cannot convert to int
+        {
+            throw e_invalid_arg();
+        }
+        catch (const std::out_of_range& e) // Out of the bound of double
+        {
+            throw e_node_out_of_range(nodeid);
+        }
+        std::cout << "modifyR "<< name << " " << resistance << std::endl;
     }
 }
 
@@ -188,8 +221,8 @@ void _printNode(std::stringstream& in_str_stream)
     {
         try
         {
-            int temp = std::stoi(nodeid);
-            if (temp < MIN_NODE_NUMBER || temp > MAX_NODE_NUMBER)
+            int temp = std::stoi(nodeid); // Check if nodeid contains other character
+            if (temp < MIN_NODE_NUMBER || temp > MAX_NODE_NUMBER) // Check if nodeid in range
             {
                 throw e_node_out_of_range(nodeid);
             }
@@ -197,7 +230,7 @@ void _printNode(std::stringstream& in_str_stream)
             std::stringstream temp_nodeid;
             temp_nodeid << nodeid;
             temp_nodeid >> int_digit;
-            if(temp_nodeid.peek() != std::char_traits<char>::eof())
+            if(temp_nodeid.peek() != std::char_traits<char>::eof()) // Check for digit sign
             {
                 throw e_invalid_arg();
             }
