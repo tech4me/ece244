@@ -144,7 +144,7 @@ int parser()
 		}
 		catch (const std::exception& e) // Other
 		{
-			std::cout << "Error " << e.what() << std::endl; // Print out exception type
+			std::cout << "Error: " << e.what() << std::endl; // Print out exception type
 		}
 
 		std::cout << "> "; // Sign for each line
