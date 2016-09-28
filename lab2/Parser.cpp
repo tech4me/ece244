@@ -32,7 +32,7 @@ class e_negative_r : public std::exception
 class e_node_out_of_range : public std::exception
 {
 public:
-	e_node_out_of_range(std::string in) : input(in) { temp = std::string("node ") + input + std::string(" is out of permitted range ") + STR(MIN_NODE_NUMBER) + std::string(" ") + STR(MAX_NODE_NUMBER); };
+	e_node_out_of_range(std::string in) : input(in) { temp = std::string("node ") + input + std::string(" is out of permitted range ") + STR(MIN_NODE_NUMBER) + std::string("-") + STR(MAX_NODE_NUMBER); };
 	~e_node_out_of_range() throw() {};
 private:
 	std::string input;
@@ -281,7 +281,7 @@ void _modifyR(std::stringstream& in_str_stream)
 		{
 			throw e_invalid_arg();
 		}
-		std::cout << "Modified: resister " << name << " to " << std::setprecision(2) << std::fixed << double_res << " Ohms" << std::endl;
+		std::cout << "Modified: resistor " << name << " to " << std::setprecision(2) << std::fixed << double_res << " Ohms" << std::endl;
 	}
 }
 
