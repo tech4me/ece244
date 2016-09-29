@@ -32,10 +32,10 @@ class e_negative_r : public std::exception
 class e_node_out_of_range : public std::exception
 {
 public:
-	e_node_out_of_range(std::string in) : input(in) { temp = std::string("node ") + input + std::string(" is out of permitted range ") + STR(MIN_NODE_NUMBER) + std::string("-") + STR(MAX_NODE_NUMBER); };
+	e_node_out_of_range(int in) : input(in) { temp = std::string("node ") + std::to_string(input) + std::string(" is out of permitted range ") + STR(MIN_NODE_NUMBER) + std::string("-") + STR(MAX_NODE_NUMBER); };
 	~e_node_out_of_range() throw() {};
 private:
-	std::string input;
+	int input;
 	std::string temp;
 
 	virtual const char* what() const throw()
@@ -55,10 +55,10 @@ class e_r_name_cannot_be_all : public std::exception
 class e_both_terminal_no_connect : public std::exception
 {
 public:
-	e_both_terminal_no_connect(std::string in) : input(in) { temp = "both termials of resistor connect to node" + input; };
+	e_both_terminal_no_connect(int in) : input(in) { temp = "both termials of resistor connect to node " + std::to_string(input); };
 	~e_both_terminal_no_connect() throw() {};
 private:
-	std::string input;
+	int input;
 	std::string temp;
 
 	virtual const char* what() const throw()
@@ -155,134 +155,110 @@ int parser()
 
 void _insertR(std::stringstream& in_str_stream)
 {
-	std::stringstream temp_str_stream;
-	temp_str_stream << in_str_stream.str();
-	std::string temp;
-	std::string dump;
-	temp_str_stream >> dump;
-	int counter = 0;
-	while (temp_str_stream >> temp)
-	{
-		++counter;
-	}
-	if (counter < 4)
-	{
-		throw e_too_few_args();
-	}
-	else if (counter > 4)
-	{
-		throw e_too_many_args();
-	}
-	else
-	{
 		std::string name;
-		std::string resistance;
-		std::string nodeid1;
-		std::string nodeid2;
-		double double_res;
-		try
+		double resistance;
+		int nodeid1;
+		int nodeid2;
+
+		if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
 		{
-			in_str_stream >> name;
-			if (name == "all")
-			{
-				throw e_r_name_cannot_be_all();
-			}
-
-			in_str_stream >> resistance;
-			double_res = std::stod(resistance);
-			if (double_res < 0)
-			{
-				throw e_negative_r();
-			}
-
-			in_str_stream >> nodeid1;
-			in_str_stream >> nodeid2;
-			int temp1 = std::stoi(nodeid1); // Check if nodeid contains other character
-			if (temp1 < MIN_NODE_NUMBER || temp1 > MAX_NODE_NUMBER) // Check if nodeid in range
-			{
-				throw e_node_out_of_range(nodeid1);
-			}
-			int int_digit;
-			std::stringstream temp_nodeid;
-			temp_nodeid << nodeid1;
-			temp_nodeid >> int_digit;
-			if (temp_nodeid.peek() != std::char_traits<char>::eof()) // Check for digit sign
-			{
-				throw e_invalid_arg();
-			}
-
-			temp_nodeid.str("");
-
-			int temp2 = std::stoi(nodeid2); // Check if nodeid contains other character
-			if (temp2 < MIN_NODE_NUMBER || temp2 > MAX_NODE_NUMBER) // Check if nodeid in range
-			{
-				throw e_node_out_of_range(nodeid2);
-			}
-			temp_nodeid << nodeid2;
-			temp_nodeid >> int_digit;
-			if (temp_nodeid.peek() != std::char_traits<char>::eof()) // Check for digit sign
-			{
-				throw e_invalid_arg();
-			}
-			
-			if (temp1 == temp2)
-			{
-				throw e_both_terminal_no_connect(nodeid1);
-			}
+			throw e_too_few_args();
 		}
-		catch (const std::invalid_argument& e)  // Cannot convert to int
-		{
-			throw e_invalid_arg();
-		}
-		std::cout << "Inserted: resistor " << name << " " << std::fixed << std::setprecision(2) << double_res << " Ohms " << nodeid1 << " -> " << nodeid2 << std::endl;
-	}
-}
-
-void _modifyR(std::stringstream& in_str_stream)
-{
-	std::stringstream temp_str_stream;
-	temp_str_stream << in_str_stream.str();
-	std::string temp;
-	std::string dump;
-	temp_str_stream >> dump;
-	int counter = 0;
-	while (temp_str_stream >> temp)
-	{
-		++counter;
-	}
-	if (counter < 2)
-	{
-		throw e_too_few_args();
-	}
-	else if (counter > 2)
-	{
-		throw e_too_many_args();
-	}
-	else
-	{
-		std::string name;
-		std::string resistance;
-		double double_res;
 		in_str_stream >> name;
 		if (name == "all")
 		{
 			throw e_r_name_cannot_be_all();
 		}
-		in_str_stream >> resistance;
-		try
+
+		if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
 		{
-			double_res = std::stod(resistance);
-			if (double_res < 0)
-			{
-				throw e_negative_r();
-			}
+			throw e_too_few_args();
 		}
-		catch (const std::invalid_argument& e)  // Cannot convert to int
+		in_str_stream >> resistance;
+		if (in_str_stream.fail())
 		{
 			throw e_invalid_arg();
 		}
-		std::cout << "Modified: resistor " << name << " to " << std::setprecision(2) << std::fixed << double_res << " Ohms" << std::endl;
+		if (resistance < 0)
+		{
+			throw e_negative_r();
+		}
+
+		if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
+		{
+			throw e_too_few_args();
+		}
+		in_str_stream >> nodeid1;
+		if (in_str_stream.fail())
+		{
+			throw e_invalid_arg();
+		}
+		if (nodeid1 < MIN_NODE_NUMBER || nodeid1 > MAX_NODE_NUMBER) // Check if nodeid in range
+		{
+			throw e_node_out_of_range(nodeid1);
+		}
+
+		if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
+		{
+			throw e_too_few_args();
+		}
+		in_str_stream >> nodeid2;
+		if (in_str_stream.fail())
+		{
+			throw e_invalid_arg();
+		}
+		if (nodeid2 < MIN_NODE_NUMBER || nodeid2 > MAX_NODE_NUMBER) // Check if nodeid in range
+		{
+			throw e_node_out_of_range(nodeid2);
+		}
+
+		if (nodeid1 == nodeid2)
+		{
+			throw e_both_terminal_no_connect(nodeid1);
+		}
+
+		if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+		{
+			throw e_too_many_args();
+		}
+
+		std::cout << "Inserted: resistor " << name << " " << std::fixed << std::setprecision(2) << resistance << " Ohms " << nodeid1 << " -> " << nodeid2 << std::endl;
+}
+
+void _modifyR(std::stringstream& in_str_stream)
+{	
+	std::string name;
+	double resistance;
+
+	if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
+	{
+		throw e_too_few_args();
 	}
+	in_str_stream >> name;
+	if (name == "all")
+	{
+		throw e_r_name_cannot_be_all();
+	}
+
+	if ((in_str_stream >> std::ws).peek() == std::char_traits<char>::eof()) // Error checking
+	{
+		throw e_too_few_args();
+	}
+
+	in_str_stream >> resistance;
+	if(in_str_stream.fail())
+	{
+		throw e_invalid_arg();
+	}
+	if (resistance < 0)
+	{
+		throw e_negative_r();
+	}
+	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+	{
+		throw e_too_many_args();
+	}
+	std::cout << "Modified: resistor " << name << " to " << std::setprecision(2) << std::fixed << resistance << " Ohms" << std::endl;
 }
 
 void _printR(std::stringstream& in_str_stream)
@@ -321,35 +297,27 @@ void _printNode(std::stringstream& in_str_stream)
 	}
 	else
 	{
-		try
-		{
-			int temp = std::stoi(nodeid); // Check if nodeid contains other character
-			if (temp < MIN_NODE_NUMBER || temp > MAX_NODE_NUMBER) // Check if nodeid in range
-			{
-				throw e_node_out_of_range(nodeid);
-			}
-			int int_digit;
-			std::stringstream temp_nodeid;
-			temp_nodeid << nodeid;
-			temp_nodeid >> int_digit;
-			if (temp_nodeid.peek() != std::char_traits<char>::eof()) // Check for digit sign
-			{
-				throw e_invalid_arg();
-			}
-			std::cout << "Print: node " << nodeid << std::endl;
-		}
-		catch (const std::invalid_argument& e) // Cannot convert to int
+		std::stringstream temp(nodeid);
+		int int_nodeid;
+		temp >> int_nodeid;
+		if (temp.fail())
 		{
 			throw e_invalid_arg();
 		}
-		catch (const std::out_of_range& e) // Out of the bound of int
+		if (temp.peek() != std::char_traits<char>::eof()) // Check for digit sign
 		{
-			throw e_node_out_of_range(nodeid);
+			throw e_invalid_arg();
 		}
-	}
-	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
-	{
-		throw e_too_many_args();
+		if (int_nodeid < MIN_NODE_NUMBER || int_nodeid > MAX_NODE_NUMBER) // Check if nodeid in range
+		{
+			throw e_node_out_of_range(int_nodeid);
+		}
+		if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+		{
+			throw e_too_many_args();
+		}
+		std::cout << "Print: node " << nodeid << std::endl;
+		
 	}
 }
 
