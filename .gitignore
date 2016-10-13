@@ -7,6 +7,9 @@
 # Unignore all dirs
 !*/
 
+# Submition log
+submit_log.*
+
 # Compiled Object files
 *.slo
 *.lo
