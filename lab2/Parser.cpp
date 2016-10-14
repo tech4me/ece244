@@ -288,15 +288,19 @@ void _printR(std::stringstream& in_str_stream)
     in_str_stream >> name;
     if (name == "all")
     {
+	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+        {
+            throw e_too_many_args();
+        }
         std::cout << "Print: all resistors" << std::endl;
     }
     else
     {
+	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+        {
+            throw e_too_many_args();
+        }
         std::cout << "Print: resistor " << name << std::endl;
-    }
-    if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
-    {
-        throw e_too_many_args();
     }
 }
 
@@ -310,6 +314,10 @@ void _printNode(std::stringstream& in_str_stream)
     in_str_stream >> nodeid;
     if (nodeid == "all")
     {
+	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+        {
+            throw e_too_many_args();
+        }
         std::cout << "Print: all nodes" << std::endl;
     }
     else
@@ -334,7 +342,6 @@ void _printNode(std::stringstream& in_str_stream)
             throw e_too_many_args();
         }
         std::cout << "Print: node " << nodeid << std::endl;
-
     }
 }
 
@@ -348,14 +355,18 @@ void _deleteR(std::stringstream& in_str_stream)
     in_str_stream >> name;
     if (name == "all")
     {
+	if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+        {
+            throw e_too_many_args();
+        }
         std::cout << "Deleted: all resistors" << std::endl;
     }
     else
     {
+        if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
+        {
+            throw e_too_many_args();
+        }
         std::cout << "Deleted: resistor " << name << std::endl;
-    }
-    if ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof()) // Error checking
-    {
-        throw e_too_many_args();
     }
 }
