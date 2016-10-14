@@ -55,7 +55,7 @@ class e_r_name_cannot_be_all : public std::exception
 class e_both_terminal_no_connect : public std::exception
 {
     public:
-        e_both_terminal_no_connect(int in) : input(in) { temp = "both termials of resistor connect to node " + std::to_string(input); };
+        e_both_terminal_no_connect(int in) : input(in) { temp = "both terminals of resistor connect to node " + std::to_string(input); };
         ~e_both_terminal_no_connect() throw() {};
     private:
         long long input;
@@ -180,7 +180,7 @@ void _insertR(std::stringstream& in_str_stream)
     {
         throw e_invalid_arg();
     }
-    if (in_str_stream.peek() != std::char_traits<char>::to_int_type(' ')) // Check for character following int
+    if (in_str_stream.peek() != std::char_traits<char>::to_int_type(' ') && ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof())) // Check for character following int
     {
         throw e_invalid_arg();
     }
@@ -198,10 +198,10 @@ void _insertR(std::stringstream& in_str_stream)
     {
         throw e_invalid_arg();
     }
-    if (in_str_stream.peek() != std::char_traits<char>::to_int_type(' ')) // Check for character following int
-	{
-		throw e_invalid_arg();
-	}
+    if (in_str_stream.peek() != std::char_traits<char>::to_int_type(' ') && ((in_str_stream >> std::ws).peek() != std::char_traits<char>::eof())) // Check for character following int
+    {
+        throw e_invalid_arg();
+    }
     if (nodeid1 < MIN_NODE_NUMBER || nodeid1 > MAX_NODE_NUMBER) // Check if nodeid in range
     {
         throw e_node_out_of_range(nodeid1);
