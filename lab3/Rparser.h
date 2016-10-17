@@ -10,8 +10,9 @@
 
 const int MAX_NODE_NUMBER = 5000;
 const int MIN_NODE_NUMBER = 0;
+const int MIN_RES_NUMBER = 0;
 
-enum command { insertR, modifyR, printR, printNode, deleteR }; // Commands list
+enum command { maxVal, insertR, modifyR, printR, printNode, deleteR }; // Commands list
 
 class e_type : public std::exception
 {
@@ -56,6 +57,13 @@ public:
     }
 
     ~error_q() throw() {};
+};
+
+class e_maxval_smaller : public e_type
+{
+public:
+    e_maxval_smaller(int pos) : e_type(1000 + pos, "maxVal arguments must be greater than 0") {}; // With priority 1000, higher is more likely to get reported
+    ~e_maxval_smaller() throw() {};
 };
 
 class e_invalid_arg : public e_type
@@ -118,15 +126,18 @@ public:
 class Rparser
 {
 private:
-    Resistor* res_array;
-    Node* node_array;
+    Resistor* res_array = nullptr;
+    Node* node_array = nullptr;
+    bool maxval_is_set = false;
 
+    void _maxVal(std::vector<std::string>& in_str);
 	void _insertR(std::vector<std::string>& in_str);
 	void _modifyR(std::vector<std::string>& in_str);
 	void _printR(std::vector<std::string>& in_str);
 	void _printNode(std::vector<std::string>& in_str);
 	void _deleteR(std::vector<std::string>& in_str);
 public:
+    ~Rparser();
 	void run(); // RUN FUNCTION
 };
 

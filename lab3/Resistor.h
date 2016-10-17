@@ -14,6 +14,7 @@ private:
     int endpointNodeIDs[2]; // IDs of nodes it attaches to
 
 public:
+    Resistor() {}; // default constructor
     Resistor(int rIndex_,string name_,double resistance_,int endpoints_[2]);
     // rIndex_ is the index of this resistor in the resistor array
 	// endpoints_ holds the node indices to which this resistor connects

@@ -3,7 +3,7 @@
 * Note to the error checking system:
 * Since position of the error has higher priority then the order of the error list,
 * the scores given to position are higher in a scale to ensure the correct output.
-* The error checking system still can be inproved to meet mordern C++ standard.
+* The error checking system still can be improved to meet mordern C++ standard.
 *
 */
 
@@ -13,12 +13,19 @@
 #include <iomanip>
 #include <map>
 
+Rparser::~Rparser()
+{
+    delete[] res_array;
+    delete[] node_array;
+}
+
 void Rparser::run()
 {
 	std::string in_buf, in_command;
 
 	std::map<std::string, command> command_map // Map commands to string
 	{
+        { "maxVal", maxVal },
 		{ "insertR", insertR },
 		{ "modifyR", modifyR },
 		{ "printR", printR },
@@ -74,6 +81,65 @@ void Rparser::run()
 		std::getline(std::cin, in_buf);
 		in_command = "";
 	}
+}
+
+void Rparser::_maxVal(std::vector<std::string>& in_str)
+{
+    error_q e;
+    int node_n = 1, res_n = 1;
+    int counter = 0;
+    for (auto it = in_str.begin(); it != in_str.end(); ++it)
+    {
+        ++counter;
+    }
+    if (counter < 3)
+        e.error_add(e_too_few_args(100));
+    else if (counter > 3)
+        e.error_add(e_too_many_args(100));
+
+    auto it = in_str.begin();
+    if (++it != in_str.end())
+    {
+        try
+        {
+            size_t pos;
+            node_n = stod(*it, &pos);
+            if (pos < it->size())
+                e.error_add(e_invalid_arg(200));
+        }
+        catch (std::invalid_argument&)
+        {
+            e.error_add(e_invalid_arg(200));
+        }
+        // Could also be out_of_range
+        if (node_n <= MIN_NODE_NUMBER)
+            e.error_add(e_maxval_smaller(200));
+        if (++it != in_str.end())
+        {
+            try
+            {
+                size_t pos;
+                res_n = stod(*it, &pos);
+                if (pos < it->size())
+                    e.error_add(e_invalid_arg(199));
+            }
+            catch (std::invalid_argument&)
+            {
+                e.error_add(e_invalid_arg(199));
+            }
+            // Could also be out_of_range
+            if (res_n <= MIN_RES_NUMBER)
+                e.error_add(e_maxval_smaller(199));
+        }
+    }
+
+    if (e.no_error())
+    {
+        node_array = new Node[node_n];
+        res_array = new Resistor[res_n];
+    }
+    else
+        throw e;
 }
 
 void Rparser::_insertR(std::vector<std::string>& in_str)
