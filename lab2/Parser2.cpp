@@ -151,39 +151,42 @@ void Rparser::run()
 		{
 			in_str.push_back(word); // Read input into a vector of strings
 		}
-
-		in_command = *in_str.begin();
-		try
+		if (in_str.begin() == in_str.end())
+			std::cout << "Error: invalid command" << std::endl;
+		else
 		{
-			switch (command_map.at(in_command)) // Commands
+			in_command = *in_str.begin();
+			try
 			{
-			case insertR:
-				_insertR(in_str);
-				break;
-			case modifyR:
-				_modifyR(in_str);
-				break;
-			case printR:
-				_printR(in_str);
-				break;
-			case printNode:
-				_printNode(in_str);
-				break;
-			case deleteR:
-				_deleteR(in_str);
-				break;
+				switch (command_map.at(in_command)) // Commands
+				{
+				case insertR:
+					_insertR(in_str);
+					break;
+				case modifyR:
+					_modifyR(in_str);
+					break;
+				case printR:
+					_printR(in_str);
+					break;
+				case printNode:
+					_printNode(in_str);
+					break;
+				case deleteR:
+					_deleteR(in_str);
+					break;
 
+				}
+			}
+			catch (const std::out_of_range&) // Undefined command
+			{
+				std::cout << "Error: invalid command" << std::endl;
+			}
+			catch (const error_q& e) // Other
+			{
+				std::cout << "Error: " << e.what() << std::endl; // Print out exception type
 			}
 		}
-		catch (const std::out_of_range&) // Undefined command
-		{
-			std::cout << "Error: invalid command" << std::endl;
-		}
-		catch (const error_q& e) // Other
-		{
-			std::cout << "Error: " << e.what() << std::endl; // Print out exception type
-		}
-
 		std::cout << "> "; // Sign for each line
 		std::getline(std::cin, in_buf);
 		in_command = "";
