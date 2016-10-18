@@ -147,13 +147,13 @@ public:
 class Rparser
 {
 private:
-    Node** node_array_ptr = nullptr;
-    Resistor** res_array_ptr = nullptr;
-    bool maxval_is_set = false;
-    int node_n = -1;
-    int res_n = -1;
-    int current_node_n = -1;
-    int current_res_n = -1;
+    Node** node_array_ptr;
+    Resistor** res_array_ptr;
+    bool maxval_is_set;
+    int node_n;
+    int res_n;
+    int current_node_n;
+    int current_res_n;
 
     void _maxVal(std::vector<std::string>& in_str);
 	void _insertR(std::vector<std::string>& in_str);
@@ -162,6 +162,7 @@ private:
 	void _printNode(std::vector<std::string>& in_str);
 	void _deleteR(std::vector<std::string>& in_str);
 public:
+    Rparser();
     ~Rparser();
 	void run(); // RUN FUNCTION
 };

@@ -13,6 +13,11 @@
 #include <iomanip>
 #include <map>
 
+Rparser::Rparser() : node_array_ptr(NULL), res_array_ptr(NULL), maxval_is_set(false), node_n(-1), res_n(-1), current_node_n(-1), current_res_n(-1)
+{
+
+}
+
 Rparser::~Rparser()
 {
     for (int i = 0; i <= current_node_n; ++i)
