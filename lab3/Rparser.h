@@ -126,8 +126,8 @@ public:
 class Rparser
 {
 private:
-    Resistor* res_array = nullptr;
-    Node* node_array = nullptr;
+    Resistor** res_array_ptr = nullptr;
+    Node** node_array_ptr = nullptr;
     bool maxval_is_set = false;
 
     void _maxVal(std::vector<std::string>& in_str);

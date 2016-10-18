@@ -45,36 +45,41 @@ void Rparser::run()
 			in_str.push_back(word); // Read input into a vector of strings
 		}
 
-		in_command = *in_str.begin();
-		try
-		{
-			switch (command_map.at(in_command)) // Commands
-			{
-			case insertR:
-				_insertR(in_str);
-				break;
-			case modifyR:
-				_modifyR(in_str);
-				break;
-			case printR:
-				_printR(in_str);
-				break;
-			case printNode:
-				_printNode(in_str);
-				break;
-			case deleteR:
-				_deleteR(in_str);
-				break;
-
-			}
-		}
-		catch (const std::out_of_range&) // Undefined command
-		{
+		if (in_str.begin() == in_str.end())
 			std::cout << "Error: invalid command" << std::endl;
-		}
-		catch (const error_q& e) // Other
+		else
 		{
-			std::cout << "Error: " << e.what() << std::endl; // Print out exception type
+			in_command = *in_str.begin();
+			try
+			{
+				switch (command_map.at(in_command)) // Commands
+				{
+				case insertR:
+					_insertR(in_str);
+					break;
+				case modifyR:
+					_modifyR(in_str);
+					break;
+				case printR:
+					_printR(in_str);
+					break;
+				case printNode:
+					_printNode(in_str);
+					break;
+				case deleteR:
+					_deleteR(in_str);
+					break;
+
+				}
+			}
+			catch (const std::out_of_range&) // Undefined command
+			{
+				std::cout << "Error: invalid command" << std::endl;
+			}
+			catch (const error_q& e) // Other
+			{
+				std::cout << "Error: " << e.what() << std::endl; // Print out exception type
+			}
 		}
 
 		std::cout << "> "; // Sign for each line
@@ -103,7 +108,7 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
         try
         {
             size_t pos;
-            node_n = stod(*it, &pos);
+            node_n = stoi(*it, &pos);
             if (pos < it->size())
                 e.error_add(e_invalid_arg(200));
         }
@@ -119,7 +124,7 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
             try
             {
                 size_t pos;
-                res_n = stod(*it, &pos);
+                res_n = stoi(*it, &pos);
                 if (pos < it->size())
                     e.error_add(e_invalid_arg(199));
             }
@@ -135,8 +140,16 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
 
     if (e.no_error())
     {
-        node_array = new Node[node_n];
-        res_array = new Resistor[res_n];
+        node_array_ptr = new Node*[node_n];
+        res_array_ptr = new Resistor*[res_n];
+		/*for (int i = 0; i < node_n; ++i)
+		{
+			*(node_array_ptr + i) = new Node();
+		}
+		for (int i = 0; i < res_n; ++i)
+		{
+			*(res_array_ptr + i) = new Resistor();
+		}*/
     }
     else
         throw e;

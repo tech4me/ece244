@@ -19,7 +19,7 @@ public:
     // rIndex_ is the index of this resistor in the resistor array
 	// endpoints_ holds the node indices to which this resistor connects
     
-    ~Resistor();
+	~Resistor() {};
     
     string getName() const; // returns the name
     double getResistance() const; // returns the resistance
