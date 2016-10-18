@@ -12,6 +12,7 @@
 
 #define MAX_RESISTORS_PER_NODE 5
 
+#include "Resistor.h"
 
 class Node
 {
@@ -23,7 +24,7 @@ private:
 public:
     
     Node(); 
-	~Node() {};
+	~Node();
  
 	// Checks to see if the resistor can be added to poistion rIndex
 	// in the resistor array. Returns true if yes, otherwise false.
@@ -36,6 +37,8 @@ public:
 	// prints the whole node
 	// nodeIndex is the position of this node in the node array.
 	void print (int nodeIndex); 
+
+    void print(int nodeIndex, Resistor** res_array_ptr); // The overloaded version I need for this lab
 
 };
 

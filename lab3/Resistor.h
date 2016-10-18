@@ -14,12 +14,11 @@ private:
     int endpointNodeIDs[2]; // IDs of nodes it attaches to
 
 public:
-    Resistor() {}; // default constructor
     Resistor(int rIndex_,string name_,double resistance_,int endpoints_[2]);
     // rIndex_ is the index of this resistor in the resistor array
 	// endpoints_ holds the node indices to which this resistor connects
     
-	~Resistor() {};
+	~Resistor();
     
     string getName() const; // returns the name
     double getResistance() const; // returns the resistance
@@ -31,6 +30,6 @@ public:
     friend ostream& operator<<(ostream&,const Resistor&);
 };
 
-ostream& operator<<(ostream&,const Resistor&);
+ostream& operator<<(ostream&, const Resistor&);
 
 #endif	/* RESISTOR_H */

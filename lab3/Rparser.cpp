@@ -15,8 +15,16 @@
 
 Rparser::~Rparser()
 {
-    delete[] res_array;
-    delete[] node_array;
+    for (int i = 0; i <= current_node_n; ++i)
+    {
+        delete *(node_array_ptr + i);
+    }
+    for (int i = 0; i < current_res_n; ++i)
+    {
+        delete *(res_array_ptr + i);
+    }
+    delete[] res_array_ptr;
+    delete[] node_array_ptr;
 }
 
 void Rparser::run()
@@ -54,6 +62,9 @@ void Rparser::run()
 			{
 				switch (command_map.at(in_command)) // Commands
 				{
+                case maxVal:
+                    _maxVal(in_str);
+                    break;
 				case insertR:
 					_insertR(in_str);
 					break;
@@ -91,7 +102,8 @@ void Rparser::run()
 void Rparser::_maxVal(std::vector<std::string>& in_str)
 {
     error_q e;
-    int node_n = 1, res_n = 1;
+    node_n = 1;
+    res_n = 1;
     int counter = 0;
     for (auto it = in_str.begin(); it != in_str.end(); ++it)
     {
@@ -138,18 +150,48 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
         }
     }
 
-    if (e.no_error())
+    if (e.no_error()) // Create or Re-Create the dynamic allocated space for the array of pointer to Node / Resistor
     {
-        node_array_ptr = new Node*[node_n];
-        res_array_ptr = new Resistor*[res_n];
-		/*for (int i = 0; i < node_n; ++i)
-		{
-			*(node_array_ptr + i) = new Node();
-		}
-		for (int i = 0; i < res_n; ++i)
-		{
-			*(res_array_ptr + i) = new Resistor();
-		}*/
+        if (maxval_is_set)
+        {
+            for (int i = 0; i <= current_node_n; ++i)
+            {
+                delete *(node_array_ptr + i);
+            }
+            for (int i = 0; i < current_res_n; ++i)
+            {
+                delete *(res_array_ptr + i);
+            }
+            delete[] node_array_ptr;
+            delete[] res_array_ptr;
+
+            MAX_NODE_NUMBER = node_n;
+            node_array_ptr = new Node*[node_n + 1];
+            res_array_ptr = new Resistor*[res_n];
+
+            current_node_n = node_n;
+            current_res_n = 0;
+
+            for (int i = 0; i <= node_n; ++i)
+            {
+                *(node_array_ptr + i) = new Node();
+            }
+        }
+        else
+        {
+            MAX_NODE_NUMBER = node_n;
+            node_array_ptr = new Node*[node_n + 1];
+            res_array_ptr = new Resistor*[res_n];
+            maxval_is_set = true;
+
+            for (int i = 0; i <= node_n; ++i)
+            {
+                *(node_array_ptr + i) = new Node();
+            }
+
+            current_node_n = node_n;
+        }
+        std::cout << "New network: max node number is " << node_n << "; max resistors is " << res_n << std::endl;
     }
     else
         throw e;
@@ -227,8 +269,15 @@ void Rparser::_insertR(std::vector<std::string>& in_str)
                         // Could also be out_of_range
                         if (nodeid2 < MIN_NODE_NUMBER || nodeid2 > MAX_NODE_NUMBER)
                             e.error_add(e_node_out_of_range(197, nodeid2));
-                        if (nodeid1 == nodeid2)
-                            e.error_add(e_both_terminal_no_connect(100, nodeid1));
+
+                        for (int i = 0; i < current_res_n; ++i) // Check for resistor name
+                        {
+                            if ((*(res_array_ptr + i))->getName() == name)
+                            {
+                                e.error_add(e_r_name_exist(0, name));
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -236,7 +285,45 @@ void Rparser::_insertR(std::vector<std::string>& in_str)
     }
 
     if (e.no_error())
-        std::cout << "Inserted: resistor " << name << " " << std::fixed << std::setprecision(2) << resistance << " Ohms " << nodeid1 << " -> " << nodeid2 << std::endl;
+    {
+        if ((*(node_array_ptr + nodeid1))->canAddResistor(current_res_n))
+        {
+            if ((*(node_array_ptr + nodeid2))->canAddResistor(current_res_n))
+            {
+                if (nodeid1 == nodeid2)
+                    e.error_add(e_both_terminal_no_connect(0, nodeid1));
+                else
+                {
+                    if (current_res_n < res_n)
+                    {
+                        int endpoints[2] = { nodeid1, nodeid2 };
+                        *(res_array_ptr + current_res_n) = new Resistor(current_res_n, name, resistance, endpoints); // Add a new resistor
+
+                        (*(node_array_ptr + nodeid1))->addResistor(current_res_n);
+                        (*(node_array_ptr + nodeid2))->addResistor(current_res_n);
+
+                        ++current_res_n;
+
+                        std::cout << "Inserted: resistor " << name << " " << std::fixed << std::setprecision(2) << resistance << " Ohms " << nodeid1 << " -> " << nodeid2 << std::endl;
+                    }
+                    else
+                    {
+                        e.error_add(e_r_array_full(0));
+                    }
+                }
+            }
+            else
+            {
+                e.error_add(e_node_full(0));
+            }
+        }
+        else
+        {
+            e.error_add(e_node_full(0));
+        }
+        if (!e.no_error())
+            throw e;
+    }
     else
         throw e;
 }
@@ -285,7 +372,26 @@ void Rparser::_modifyR(std::vector<std::string>& in_str)
     }
 
     if (e.no_error())
-        std::cout << "Modified: resistor " << name << " to " << std::setprecision(2) << std::fixed << resistance << " Ohms" << std::endl;
+    {
+        int name_r_id = -1;
+        for (int i = 0; i < current_res_n; ++i) // Check for resistor name
+        {
+            if ((*(res_array_ptr + i))->getName() == name)
+                name_r_id = i;
+        }
+        if (name_r_id != -1)
+        {
+            double pre_r = (*(res_array_ptr + name_r_id))->getResistance();
+            (*(res_array_ptr + name_r_id))->setResistance(resistance);
+            std::cout << "Modified: resistor " << name << " from " << std::setprecision(2) << std::fixed << pre_r <<" Ohms to " << std::setprecision(2) << std::fixed << resistance << " Ohms" << std::endl;
+        }
+        else
+        {
+            e.error_add(e_r_name_not_found(0, name));
+        }
+        if (!e.no_error())
+            throw e;
+    }
     else
         throw e;
 }
@@ -310,10 +416,31 @@ void Rparser::_printR(std::vector<std::string>& in_str)
 
     if (e.no_error())
     {
-        if (name == "all")
-            std::cout << "Print: all resistors" << std::endl;
+        int name_r_id = -1;
+        for (int i = 0; i < current_res_n; ++i) // Check for resistor name
+        {
+            if ((*(res_array_ptr + i))->getName() == name)
+                name_r_id = i;
+        }
+        if (name_r_id != -1)
+        {
+            std::cout << "Print:" << std::endl;
+            std::cout << **(res_array_ptr + name_r_id) << std::endl;
+        }
+        else if ((name_r_id == -1) && (name == "all"))
+        {
+            std::cout << "Print:" << std::endl;
+            for (int i = 0; i < current_res_n; ++i) // Print every resistor
+            {
+                std::cout << **(res_array_ptr + i) << std::endl;
+            }
+        }
         else
-            std::cout << "Print: resistor " << name << std::endl;
+        {
+            e.error_add(e_r_name_not_found(0, name));
+        }
+        if (!e.no_error())
+            throw e;
     }
     else
         throw e;
@@ -323,6 +450,7 @@ void Rparser::_printNode(std::vector<std::string>& in_str)
 {
     error_q e;
     std::string nodeid;
+    int int_nodeid = 1;
     int counter = 0;
     for (auto it = in_str.begin(); it != in_str.end(); ++it)
     {
@@ -339,7 +467,6 @@ void Rparser::_printNode(std::vector<std::string>& in_str)
         nodeid = *it;
         if (nodeid != "all")
         {
-            int int_nodeid = 1;
             try
             {
                 size_t pos;
@@ -361,10 +488,21 @@ void Rparser::_printNode(std::vector<std::string>& in_str)
 
     if (e.no_error())
     {
-        if (nodeid == "all")
-            std::cout << "Print: all nodes" << std::endl;
+        if (nodeid != "all")
+        {
+            std::cout << "Print:" << std::endl;
+            (*(node_array_ptr + int_nodeid))->print(int_nodeid, res_array_ptr);
+        }
         else
-            std::cout << "Print: node " << nodeid << std::endl;
+        {
+            std::cout << "Print:" << std::endl;
+            for (int i = 0; i <= MAX_NODE_NUMBER; ++i)
+            {
+                (*(node_array_ptr + i))->print(i, res_array_ptr);
+            }
+        }
+        if (!e.no_error())
+            throw e;
     }
     else
         throw e;
@@ -391,9 +529,23 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
     if (e.no_error())
     {
         if (name == "all")
+        {
+            for (int i = 0; i <= current_node_n; ++i)
+            {
+                delete *(node_array_ptr + i);
+            }
+            for (int i = 0; i < current_res_n; ++i)
+            {
+                delete *(res_array_ptr + i);
+            }
+            for (int i = 0; i <= node_n; ++i)
+            {
+                *(node_array_ptr + i) = new Node();
+            }
             std::cout << "Deleted: all resistors" << std::endl;
-        else
-            std::cout << "Deleted: resistor " << name << std::endl;
+        }
+        if (!e.no_error())
+            throw e;
     }
     else
         throw e;

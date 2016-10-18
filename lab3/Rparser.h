@@ -7,10 +7,11 @@
 #include <queue>
 #include <vector>
 #include <stdexcept>
+#include <typeinfo>
 
-const int MAX_NODE_NUMBER = 5000;
-const int MIN_NODE_NUMBER = 0;
-const int MIN_RES_NUMBER = 0;
+static int MAX_NODE_NUMBER = 0;
+static const int MIN_NODE_NUMBER = 0;
+static const int MIN_RES_NUMBER = 0;
 
 enum command { maxVal, insertR, modifyR, printR, printNode, deleteR }; // Commands list
 
@@ -66,6 +67,34 @@ public:
     ~e_maxval_smaller() throw() {};
 };
 
+class e_r_name_not_found : public e_type
+{
+public:
+    e_r_name_not_found(int pos, std::string name) : e_type(999 + pos, "resistor " + name + " not found") {}; // With priority 999, higher is more likely to get reported
+    ~e_r_name_not_found() throw() {};
+};
+
+class e_r_array_full : public e_type
+{
+public:
+    e_r_array_full(int pos) : e_type(997 + pos, "resistor array is full") {}; // With priority 997, higher is more likely to get reported
+    ~e_r_array_full() throw() {};
+};
+
+class e_node_full : public e_type
+{
+public:
+    e_node_full(int pos) : e_type(996 + pos, "node is full") {}; // With priority 996, higher is more likely to get reported
+    ~e_node_full() throw() {};
+};
+
+class e_r_name_exist : public e_type
+{
+public:
+    e_r_name_exist(int pos, std::string name) : e_type(995 + pos, "resistor " + name + " already exists") {}; // With priority 995, higher is more likely to get reported
+    ~e_r_name_exist() throw() {};
+};
+
 class e_invalid_arg : public e_type
 {
 public:
@@ -85,14 +114,6 @@ class e_node_out_of_range : public e_type
 public:
     e_node_out_of_range(int pos, int in) : e_type(4 + pos, "node " + std::to_string(static_cast<long long>(in)) + " is out of permitted range 0-" + std::to_string(static_cast<long long>(MAX_NODE_NUMBER))) {}; // With priority 4, higher is more likely to get reported
     ~e_node_out_of_range() throw() {};
-private:
-	long long input;
-	std::string temp;
-
-	virtual const char* what() const throw()
-	{
-		return temp.c_str();
-	}
 };
 
 class e_r_name_cannot_be_all : public e_type
@@ -126,9 +147,13 @@ public:
 class Rparser
 {
 private:
-    Resistor** res_array_ptr = nullptr;
     Node** node_array_ptr = nullptr;
+    Resistor** res_array_ptr = nullptr;
     bool maxval_is_set = false;
+    int node_n = -1;
+    int res_n = -1;
+    int current_node_n = -1;
+    int current_res_n = -1;
 
     void _maxVal(std::vector<std::string>& in_str);
 	void _insertR(std::vector<std::string>& in_str);
