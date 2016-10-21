@@ -548,6 +548,7 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
             {
                 *(node_array_ptr + i) = new Node();
             }
+            current_node_n = node_n;
             current_res_n = 0;
             std::cout << "Deleted: all resistors" << std::endl;
         }
