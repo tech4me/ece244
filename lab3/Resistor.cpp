@@ -29,5 +29,5 @@ void Resistor::setResistance(double resistance_)
 
 ostream& operator<<(ostream& out, const Resistor& in) // Overloaded operator<<
 {
-    return  out << in.getName() << std::setw(20) << " " << std::setw(8) << in.getResistance() << " Ohms " << in.endpointNodeIDs[0] << " -> " << in.endpointNodeIDs[1];
+    return  out << std::left << std::setfill(' ') << std::setw(20) << in.getName() << " " << std::setfill(' ') << std::setw(8) << in.getResistance() << " Ohms " << in.endpointNodeIDs[0] << " -> " << in.endpointNodeIDs[1];
 }

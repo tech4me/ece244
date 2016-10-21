@@ -195,6 +195,7 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
             }
 
             current_node_n = node_n;
+            current_res_n = 0;
         }
         std::cout << "New network: max node number is " << node_n << "; max resistors is " << res_n << std::endl;
     }
@@ -547,6 +548,7 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
             {
                 *(node_array_ptr + i) = new Node();
             }
+            current_res_n = 0;
             std::cout << "Deleted: all resistors" << std::endl;
         }
         if (!e.no_error())
