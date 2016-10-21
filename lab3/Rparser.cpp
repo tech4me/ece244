@@ -13,12 +13,12 @@
 #include <iomanip>
 #include <map>
 
-Rparser::Rparser() : node_array_ptr(NULL), res_array_ptr(NULL), maxval_is_set(false), node_n(-1), res_n(-1), current_node_n(-1), current_res_n(-1)
+Rparser::Rparser() : node_array_ptr(NULL), res_array_ptr(NULL), maxval_is_set(false), node_n(-1), res_n(-1), current_node_n(-1), current_res_n(-1) // Constructor, init variables
 {
 
 }
 
-Rparser::~Rparser()
+Rparser::~Rparser() // Destructor, free everything when exit
 {
     for (int i = 0; i <= current_node_n; ++i)
     {
@@ -65,7 +65,7 @@ void Rparser::run()
 			in_command = *in_str.begin();
 			try
 			{
-				switch (command_map.at(in_command)) // Commands
+				switch (command_map.at(in_command)) // Commands handling
 				{
                 case maxVal:
                     _maxVal(in_str);
@@ -110,7 +110,7 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
     node_n = 1;
     res_n = 1;
     int counter = 0;
-    for (auto it = in_str.begin(); it != in_str.end(); ++it)
+    for (auto it = in_str.begin(); it != in_str.end(); ++it) // Check for number of arguments
     {
         ++counter;
     }
@@ -157,7 +157,7 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
 
     if (e.no_error()) // Create or Re-Create the dynamic allocated space for the array of pointer to Node / Resistor
     {
-        if (maxval_is_set)
+        if (maxval_is_set) // if maxVal was issued before, make sure to delete everything before newing anything
         {
             for (int i = 0; i <= current_node_n; ++i)
             {
@@ -171,8 +171,8 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
             delete[] res_array_ptr;
 
             MAX_NODE_NUMBER = node_n;
-            node_array_ptr = new Node*[node_n + 1];
-            res_array_ptr = new Resistor*[res_n];
+            node_array_ptr = new Node*[node_n + 1]; // allocate an array of pointers
+            res_array_ptr = new Resistor*[res_n]; // allocate an array of pointers
 
             current_node_n = node_n;
             current_res_n = 0;
@@ -185,17 +185,17 @@ void Rparser::_maxVal(std::vector<std::string>& in_str)
         else
         {
             MAX_NODE_NUMBER = node_n;
-            node_array_ptr = new Node*[node_n + 1];
-            res_array_ptr = new Resistor*[res_n];
+            node_array_ptr = new Node*[node_n + 1]; // allocate an array of pointers
+            res_array_ptr = new Resistor*[res_n]; // allocate an array of pointers
             maxval_is_set = true;
 
-            for (int i = 0; i <= node_n; ++i)
+            for (int i = 0; i <= node_n; ++i) // Instantation of objects for nodes
             {
                 *(node_array_ptr + i) = new Node();
             }
 
-            current_node_n = node_n;
-            current_res_n = 0;
+            current_node_n = node_n; // set the current number of nodes in the system
+            current_res_n = 0; // set the current number of resistors in the system
         }
         std::cout << "New network: max node number is " << node_n << "; max resistors is " << res_n << std::endl;
     }
@@ -210,7 +210,7 @@ void Rparser::_insertR(std::vector<std::string>& in_str)
     double resistance = 1;
     int nodeid1 = 1, nodeid2 = 2;
 	int counter = 0;
-	for (auto it = in_str.begin(); it != in_str.end(); ++it)
+	for (auto it = in_str.begin(); it != in_str.end(); ++it) // Check for number of arguments
 	{
 		++counter;
 	}
@@ -290,9 +290,9 @@ void Rparser::_insertR(std::vector<std::string>& in_str)
         }
     }
 
-    if (e.no_error())
+    if (e.no_error()) // If no input error from lab2
     {
-        if ((*(node_array_ptr + nodeid1))->canAddResistor(current_res_n))
+        if ((*(node_array_ptr + nodeid1))->canAddResistor(current_res_n)) // Both nodes need to be able to insert resistor
         {
             if ((*(node_array_ptr + nodeid2))->canAddResistor(current_res_n))
             {
@@ -303,9 +303,9 @@ void Rparser::_insertR(std::vector<std::string>& in_str)
                     if (current_res_n < res_n)
                     {
                         int endpoints[2] = { nodeid1, nodeid2 };
-                        *(res_array_ptr + current_res_n) = new Resistor(current_res_n, name, resistance, endpoints); // Add a new resistor
+                        *(res_array_ptr + current_res_n) = new Resistor(current_res_n, name, resistance, endpoints); // Add a new resistor instance
 
-                        (*(node_array_ptr + nodeid1))->addResistor(current_res_n);
+                        (*(node_array_ptr + nodeid1))->addResistor(current_res_n); // Add the resistors to nodes
                         (*(node_array_ptr + nodeid2))->addResistor(current_res_n);
 
                         ++current_res_n;
@@ -340,7 +340,7 @@ void Rparser::_modifyR(std::vector<std::string>& in_str)
     std::string name;
     double resistance = 1;
     int counter = 0;
-    for (auto it = in_str.begin(); it != in_str.end(); ++it)
+    for (auto it = in_str.begin(); it != in_str.end(); ++it) // Number of arguments
     {
         ++counter;
     }
@@ -357,7 +357,7 @@ void Rparser::_modifyR(std::vector<std::string>& in_str)
             e.error_add(e_r_name_cannot_be_all(200));
         else
         {
-            if (++it != in_str.end())
+            if (++it != in_str.end()) // Cases where problems with resistor
             {
                 try
                 {
@@ -387,7 +387,7 @@ void Rparser::_modifyR(std::vector<std::string>& in_str)
         }
         if (name_r_id != -1)
         {
-            double pre_r = (*(res_array_ptr + name_r_id))->getResistance();
+            double pre_r = (*(res_array_ptr + name_r_id))->getResistance(); // modify resistor
             (*(res_array_ptr + name_r_id))->setResistance(resistance);
             std::cout << "Modified: resistor " << name << " from " << std::setprecision(2) << std::fixed << pre_r <<" Ohms to " << std::setprecision(2) << std::fixed << resistance << " Ohms" << std::endl;
         }
@@ -407,7 +407,7 @@ void Rparser::_printR(std::vector<std::string>& in_str)
     error_q e;
     std::string name;
     int counter = 0;
-    for (auto it = in_str.begin(); it != in_str.end(); ++it)
+    for (auto it = in_str.begin(); it != in_str.end(); ++it) // total number of arguments
     {
         ++counter;
     }
@@ -428,7 +428,7 @@ void Rparser::_printR(std::vector<std::string>& in_str)
             if ((*(res_array_ptr + i))->getName() == name)
                 name_r_id = i;
         }
-        if (name_r_id != -1)
+        if (name_r_id != -1) // Resistor name found
         {
             std::cout << "Print:" << std::endl;
             std::cout << **(res_array_ptr + name_r_id) << std::endl;
@@ -443,7 +443,7 @@ void Rparser::_printR(std::vector<std::string>& in_str)
         }
         else
         {
-            e.error_add(e_r_name_not_found(0, name));
+            e.error_add(e_r_name_not_found(0, name)); // Can not find resistor
         }
         if (!e.no_error())
             throw e;
@@ -458,7 +458,7 @@ void Rparser::_printNode(std::vector<std::string>& in_str)
     std::string nodeid;
     int int_nodeid = 1;
     int counter = 0;
-    for (auto it = in_str.begin(); it != in_str.end(); ++it)
+    for (auto it = in_str.begin(); it != in_str.end(); ++it) // total number of arguments
     {
         ++counter;
     }
@@ -497,14 +497,14 @@ void Rparser::_printNode(std::vector<std::string>& in_str)
         if (nodeid != "all")
         {
             std::cout << "Print:" << std::endl;
-            (*(node_array_ptr + int_nodeid))->print(int_nodeid, res_array_ptr);
+            (*(node_array_ptr + int_nodeid))->print(int_nodeid, res_array_ptr); // Print one node
         }
         else
         {
             std::cout << "Print:" << std::endl;
             for (int i = 0; i <= MAX_NODE_NUMBER; ++i)
             {
-                (*(node_array_ptr + i))->print(i, res_array_ptr);
+                (*(node_array_ptr + i))->print(i, res_array_ptr); // Print all nodes
             }
         }
         if (!e.no_error())
@@ -536,7 +536,7 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
     {
         if (name == "all")
         {
-            for (int i = 0; i <= current_node_n; ++i)
+            for (int i = 0; i <= current_node_n; ++i) // Loop through everything to free everything
             {
                 delete *(node_array_ptr + i);
             }
@@ -544,7 +544,7 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
             {
                 delete *(res_array_ptr + i);
             }
-            for (int i = 0; i <= node_n; ++i)
+            for (int i = 0; i <= node_n; ++i) // Create new nodes, so they are cleaned
             {
                 *(node_array_ptr + i) = new Node();
             }

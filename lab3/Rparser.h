@@ -15,7 +15,7 @@ static const int MIN_RES_NUMBER = 0;
 
 enum command { maxVal, insertR, modifyR, printR, printNode, deleteR }; // Commands list
 
-class e_type : public std::exception
+class e_type : public std::exception // Father class for the exception classes to inherient from
 {
 public:
     int priority;
@@ -29,30 +29,30 @@ protected:
 class cmp
 {
 public:
-    bool operator() (e_type a, e_type b)
+    bool operator() (e_type a, e_type b) // Compare priority in priority_queue
     {
         return a.priority < b.priority;
     }
 };
 
-class error_q : public std::exception
+class error_q : public std::exception // Class to print out error with highest priority
 {
 private:
     std::priority_queue<e_type, std::vector<e_type>, cmp> error_msg_queue;
 
 public:
 
-    void error_add(e_type excp)
+    void error_add(e_type excp) // Add a new error to the error queue
     {
         error_msg_queue.push(excp);
     }
 
-    bool no_error() const
+    bool no_error() const // if there is no error to report
     {
         return error_msg_queue.empty() ? true : false;
     }
 
-    virtual const char* what() const throw()
+    virtual const char* what() const throw() // Error print
     {
         return error_msg_queue.top().e_msg.c_str();
     }
@@ -147,14 +147,15 @@ public:
 class Rparser
 {
 private:
-    Node** node_array_ptr;
-    Resistor** res_array_ptr;
+    Node** node_array_ptr; // double pointer
+    Resistor** res_array_ptr; // double pointer
     bool maxval_is_set;
     int node_n;
     int res_n;
     int current_node_n;
     int current_res_n;
 
+    // Commands functions
     void _maxVal(std::vector<std::string>& in_str);
 	void _insertR(std::vector<std::string>& in_str);
 	void _modifyR(std::vector<std::string>& in_str);
