@@ -4,6 +4,8 @@
 Node::Node(int nodeid)
 	: node_id(nodeid)
 	, next(NULL)
+	, voltage(0)
+	, is_set(false)
 {
     
 }
@@ -31,6 +33,33 @@ Node*& Node::get_next()
 Node* Node::c_get_next() const
 {
 	return next;
+}
+
+double Node::get_voltage() const
+{
+	return voltage;
+}
+
+void Node::set_voltage(double voltage_)
+{
+	voltage = voltage_;
+	is_set = true;
+}
+
+void Node::set_voltage_cal(double voltage_)
+{
+	voltage = voltage_;
+}
+
+void Node::unset_voltage()
+{
+	voltage = 0;
+	is_set = false;
+}
+
+bool Node::voltage_is_set() const
+{
+	return is_set ? true : false;
 }
 
 int Node::get_nodeid() const

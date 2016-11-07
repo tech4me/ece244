@@ -22,6 +22,8 @@ public:
     
     std::string get_name() const; // returns the name
     double get_resistance() const; // returns the resistance
+	int get_end_id_1() const; // returns endpoint id1
+	int get_end_id_2() const; // returns endpoint id2
 	int get_large_endpoint_id() const; // returns the larger endpoint id
     
     void set_resistance (double resistance_);

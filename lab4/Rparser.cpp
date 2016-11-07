@@ -34,6 +34,9 @@ void Rparser::run()
 		{ "printR", printR },
 		{ "printNode", printNode },
 		{ "deleteR", deleteR },
+		{ "setV", setV },
+		{ "unsetV", unsetV },
+		{ "solve", solve }
 	};
 
 	std::cout << "> "; // Sign for each line
@@ -73,13 +76,13 @@ void Rparser::run()
 					_deleteR(in_str);
 					break;
 				case setV:
-					//_setV(in_str);
+					_setV(in_str);
 					break;
 				case unsetV:
-					//_unsetV(in_str);
+					_unsetV(in_str);
 					break;
 				case solve:
-					//_solve(in_str);
+					_solve(in_str);
 					break;
 				}
 			}
@@ -388,7 +391,8 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
         }
 		else if (node_list.find_resistor_in_node_list(name) != NULL)
 		{
-
+			node_list.delete_resistor(name);
+			std::cout << "Deleted: resistor " << name << std::endl;
 		}
 		else
 		{
@@ -399,4 +403,140 @@ void Rparser::_deleteR(std::vector<std::string>& in_str)
     }
     else
         throw e;
+}
+
+void Rparser::_setV(std::vector<std::string>& in_str)
+{
+	error_q e;
+	std::string nodeid;
+	std::string voltage;
+	int int_nodeid = 1;
+	double double_voltage = 0;
+
+	int counter = 0;
+	for (auto it = in_str.begin(); it != in_str.end(); ++it)
+	{
+		++counter;
+	}
+	if (counter < 3)
+		e.error_add(e_too_few_args(100));
+	else if (counter > 3)
+		e.error_add(e_too_many_args(100));
+
+	auto it = in_str.begin();
+	if (++it != in_str.end())
+	{
+		nodeid = *it;
+		try
+		{
+			size_t pos;
+			int_nodeid = stoi(*it, &pos);
+			if (pos < it->size())
+				e.error_add(e_invalid_arg(200));
+		}
+		catch (std::invalid_argument&)
+		{
+			e.error_add(e_invalid_arg(200));
+		}
+		// Could also be out_of_range
+		if (++it != in_str.end())
+		{
+			voltage = *it;
+			try
+			{
+				size_t pos;
+				double_voltage = stod(*it, &pos);
+				if (pos < it->size())
+					e.error_add(e_invalid_arg(150));
+			}
+			catch (std::invalid_argument&)
+			{
+				e.error_add(e_invalid_arg(150));
+			}
+			// Could also be out_of_range
+		}
+	}
+	if (e.no_error())
+	{
+		if (node_list.node_exsist(int_nodeid) != NULL) // Find if nodeid exsist
+		{
+			node_list.node_exsist(int_nodeid)->set_voltage(double_voltage);
+			std::cout << "Set: node " << int_nodeid << " to " << std::setprecision(2) << std::fixed << double_voltage << " Volts" << std::endl;
+		}
+		else
+		{
+			e.error_add(e_nodeid_not_found(0, int_nodeid));
+		}
+		if (!e.no_error())
+			throw e;
+	}
+	else
+		throw e;
+}
+
+void Rparser::_unsetV(std::vector<std::string>& in_str)
+{
+	error_q e;
+	std::string nodeid;
+	int int_nodeid = 1;
+
+	int counter = 0;
+	for (auto it = in_str.begin(); it != in_str.end(); ++it)
+	{
+		++counter;
+	}
+	if (counter < 2)
+		e.error_add(e_too_few_args(100));
+	else if (counter > 2)
+		e.error_add(e_too_many_args(100));
+
+	auto it = in_str.begin();
+	if (++it != in_str.end())
+	{
+		nodeid = *it;
+		try
+		{
+			size_t pos;
+			int_nodeid = stoi(*it, &pos);
+			if (pos < it->size())
+				e.error_add(e_invalid_arg(200));
+		}
+		catch (std::invalid_argument&)
+		{
+			e.error_add(e_invalid_arg(200));
+		}
+		// Could also be out_of_range
+	}
+	if (e.no_error())
+	{
+		if (node_list.node_exsist(int_nodeid) != NULL) // Find if nodeid exsist
+		{
+			node_list.node_exsist(int_nodeid)->unset_voltage();
+			std::cout << "Unset: the solver will determine the voltage of node " << int_nodeid << std::endl;
+		}
+		else
+		{
+			e.error_add(e_nodeid_not_found(0, int_nodeid));
+		}
+		if (!e.no_error())
+			throw e;
+	}
+	else
+		throw e;
+}
+
+void Rparser::_solve(std::vector<std::string>& in_str)
+{
+	error_q e;
+	if(!node_list.check_voltage_set())
+	{
+		e.error_add(e_node_voltage_not_set(0));
+	}
+	if (e.no_error())
+	{
+		std::cout << "Solve: " << std::endl;
+		node_list.solve();
+	}
+	else
+		throw e;
 }

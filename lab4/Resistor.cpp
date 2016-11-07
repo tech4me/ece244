@@ -34,6 +34,16 @@ double Resistor::get_resistance() const // const member function
 	return resistance;
 }
 
+int Resistor::get_end_id_1() const
+{
+	return endpointNodeIDs[0];
+}
+
+int Resistor::get_end_id_2() const
+{
+	return endpointNodeIDs[1];
+}
+
 int Resistor::get_large_endpoint_id() const // const member function
 {
 	return endpointNodeIDs[0] > endpointNodeIDs[1] ? endpointNodeIDs[0] : endpointNodeIDs[1];

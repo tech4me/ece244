@@ -156,9 +156,9 @@ private:
 	void _printR(std::vector<std::string>& in_str);
 	void _printNode(std::vector<std::string>& in_str);
 	void _deleteR(std::vector<std::string>& in_str);
-	//void _setV(std::vector<std::string>& in_str);
-	//void _unsetV(std::vector<std::string>& in_str);
-	//void _solve(std::vector<std::string>& in_str);
+	void _setV(std::vector<std::string>& in_str);
+	void _unsetV(std::vector<std::string>& in_str);
+	void _solve(std::vector<std::string>& in_str);
 public:
     Rparser();
     ~Rparser();
