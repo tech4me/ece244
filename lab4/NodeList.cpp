@@ -42,11 +42,11 @@ double NodeList::get_equation_v_r(Node* ptr) const
 	{
 		if (ptr->get_nodeid() == temp_ptr->get_end_id_1())
 		{
-			result += node_exsist(temp_ptr->get_end_id_2())->get_voltage() / temp_ptr->get_resistance();
+			result += (node_exsist(temp_ptr->get_end_id_2())->get_voltage() / temp_ptr->get_resistance());
 		}
 		else
 		{
-			result += node_exsist(temp_ptr->get_end_id_1())->get_voltage() / temp_ptr->get_resistance();
+			result += (node_exsist(temp_ptr->get_end_id_1())->get_voltage() / temp_ptr->get_resistance());
 		}
 		temp_ptr = temp_ptr->c_get_next();
 	}
