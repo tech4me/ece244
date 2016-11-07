@@ -22,11 +22,11 @@ public:
 	ResistorList c_get_resistor_list() const;
 
 	Node*& get_next(); 
-	Node* Node::c_get_next() const;
+	Node* c_get_next() const;
 
 	double get_voltage() const; // Return voltage
 	void set_voltage(double voltage_); // Set the voltage
-	void Node::set_voltage_cal(double voltage_); // Set voltage in calculation without changing is_set
+	void set_voltage_cal(double voltage_); // Set voltage in calculation without changing is_set
 	void unset_voltage(); // Unset the voltage
 	bool voltage_is_set() const; // Determine if voltage is set
 	int get_nodeid() const; // Get nodeid
