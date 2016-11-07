@@ -206,19 +206,6 @@ void NodeList::delete_resistor_all()
 			{
 				break;
 			}
-			else
-			{
-				if (res_temp_ptr->c_get_next() == NULL)
-				{
-					delete res_temp_ptr;
-					res_temp_ptr = NULL;
-					temp_ptr->get_resistor_list().get_resistor() = NULL;
-				}
-				else
-				{
-					res_temp_ptr = res_temp_ptr->c_get_next();
-				}
-			}
 		}
 		temp_save = temp_ptr->c_get_next();
 		delete temp_ptr;
@@ -227,19 +214,6 @@ void NodeList::delete_resistor_all()
 		if (temp_ptr == NULL) // Meet the end of nodelist
 		{
 			return;
-		}
-		else
-		{
-			if (temp_ptr->c_get_next() == NULL)
-			{
-				delete temp_ptr;
-				temp_ptr = NULL;
-				head = NULL;
-			}
-			else
-			{
-				temp_ptr = temp_ptr->c_get_next();
-			}
 		}
 	}
 }
