@@ -20,7 +20,7 @@ Rparser::Rparser()
 
 Rparser::~Rparser() // Destructor, free everything when exit
 {
-	
+	node_list.delete_resistor_all();
 }
 
 void Rparser::run()
