@@ -110,6 +110,7 @@ bool TreeDB::insert(DBentry* newEntry)
 
 DBentry* TreeDB::find(string name)
 {
+    resetCount();
     return recursionFind(root, name);
 }
 
@@ -176,7 +177,6 @@ void TreeDB::clear()
 void TreeDB::printProbes() const
 {
     std::cout << probesCount + 1 << std::endl;
-    resetCount();
 }
 
 void TreeDB::countActive() const
