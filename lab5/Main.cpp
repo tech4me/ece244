@@ -1,6 +1,3 @@
-#include <stdlib.h>  
-#include <crtdbg.h> 
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -34,7 +31,7 @@ int main()
         {
             in_str.push_back(word); // Read input into a vector
         }
-        in_command = *in_str.cbegin(); // The first word in vector
+        in_command = *in_str.begin(); // The first word in vector
         if (in_command == "insert")
         {
             insert(in_str, db);

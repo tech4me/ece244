@@ -1,4 +1,5 @@
 #include "DBentry.h"
+#include <iostream>
 
 DBentry::DBentry()
     : IPaddress(0)
