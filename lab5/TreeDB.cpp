@@ -157,7 +157,10 @@ bool TreeDB::remove(string name)
         else
             (pre_ptr->*func_ptr)(pre_temp);
         pre_pre_temp->setRight(NULL); // Set the end of the Node to NULL
-        pre_temp->setLeft(ptr->getLeft());
+        if (ptr->getLeft() == pre_temp)
+            pre_temp->setLeft(NULL);
+        else
+            pre_temp->setLeft(ptr->getLeft());
         pre_temp->setRight(temp_right);
         delete ptr;
         return true;
