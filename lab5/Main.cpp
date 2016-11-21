@@ -95,6 +95,7 @@ void insert(std::vector<std::string>& in, TreeDB& DB)
     }
     else
     {
+        delete ptr;
         std::cout << "Error: entry already exists" << std::endl;
     }
 }

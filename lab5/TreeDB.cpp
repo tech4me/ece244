@@ -27,12 +27,12 @@ bool TreeDB::recursionInsert(TreeNode* ptr, TreeNode* pre_ptr, void (TreeNode::*
         return recursionInsert(ptr->getRight(), ptr, &TreeNode::setRight, entry);
 }
 
-TreeNode* TreeDB::recursionFind(TreeNode* ptr, std::string name) const
+DBentry* TreeDB::recursionFind(TreeNode* ptr, std::string name) const
 {
     if (ptr == NULL)
         return NULL;
     if (ptr->getEntry()->getName() == name)
-        return ptr;
+        return ptr->getEntry();
     else if (ptr->getEntry()->getName() > name)
     {
         ++probesCount;
@@ -110,7 +110,7 @@ bool TreeDB::insert(DBentry* newEntry)
 
 DBentry* TreeDB::find(string name)
 {
-    return recursionFind(root, name)->getEntry();
+    return recursionFind(root, name);
 }
 
 bool TreeDB::remove(string name)

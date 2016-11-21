@@ -29,7 +29,7 @@ private:
 
    void resetCount() const;
    bool recursionInsert(TreeNode* ptr, TreeNode* pre_ptr, void (TreeNode::*func_ptr) (TreeNode*), DBentry* entry);
-   TreeNode* recursionFind(TreeNode* ptr, std::string name) const;
+   DBentry* recursionFind(TreeNode* ptr, std::string name) const;
    twoNodes prePtrFind(TreeNode* ptr, TreeNode* pre_ptr, std::string name, void (TreeNode::* const & func_ptr) (TreeNode*)) const;
    void inorderPrint(TreeNode* ptr) const;
    void inorderactiveCount(TreeNode* ptr) const;
